@@ -2,10 +2,6 @@ var bodyParser = require('body-parser')
 var cookieParser = require('cookie-parser')
 var express = require('express')
 var timeout = require('connect-timeout')
-
-
-
-
 var Promise = require('bluebird');
 var util = require('util');
 var fs = require('fs');
@@ -19,8 +15,6 @@ var download = function(){
       url:'http://f9.stream.nixcdn.com/ad0ddeed0d46e43f9a6861a9648f69ae/585cf314/SongClip31/NhaLaDeTroTap8TinhNgayLyGian-VA-4709586.mp4',
       agent: agent
     }
-
-
   return Promise.promisify(function (done) {
     request(firstReq).pipe(fs.createWriteStream("hello.mp4")).on( 'error', function(err) {
       console.log('download video with error:%s', err);
@@ -32,22 +26,16 @@ var download = function(){
   })();
 };
 
-
-
 // example of using this top-level; note the use of haltOnTimedout
 // after every middleware; it will stop the request flow on a timeout
 var app = express()
-//app.use(timeout('15m'))
 app.use(bodyParser())
-//app.use(haltOnTimedout)
+
 app.use(cookieParser())
-//app.use(haltOnTimedout)
 
 // Add your routes here, etc.
-
-
-
 app.post('/save', function (req, res, next) {
+
    req.setTimeout(0);
     download().then( function(result){
       res.json({status:200});
@@ -55,13 +43,7 @@ app.post('/save', function (req, res, next) {
     }).catch( function(err){
       console.log('err:%s', err);
       res.json({status:err});
-
     });
- 
 });
-
-// function haltOnTimedout (req, res, next) {
-//   if (!req.timedout) next()
-// }
 
 app.listen(3000)
