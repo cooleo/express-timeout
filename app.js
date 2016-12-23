@@ -13,9 +13,16 @@ var request = require('request');
 var fs = require('fs');
 
 
-var download = function(url){
+var download = function(){
+  var agent = new require('http').Agent({ keepAlive: true })
+    var firstReq = {
+      url:'http://f9.stream.nixcdn.com/ad0ddeed0d46e43f9a6861a9648f69ae/585cf314/SongClip31/NhaLaDeTroTap8TinhNgayLyGian-VA-4709586.mp4',
+      agent: agent
+    }
+
+
   return Promise.promisify(function (done) {
-    request(url).pipe(fs.createWriteStream("hello.mp4")).on( 'error', function(err) {
+    request(firstReq).pipe(fs.createWriteStream("hello.mp4")).on( 'error', function(err) {
       console.log('download video with error:%s', err);
       done(null, "hung");
     }).on('close', function(){
@@ -30,33 +37,31 @@ var download = function(url){
 // example of using this top-level; note the use of haltOnTimedout
 // after every middleware; it will stop the request flow on a timeout
 var app = express()
-app.use(timeout('15m'))
+//app.use(timeout('15m'))
 app.use(bodyParser())
-app.use(haltOnTimedout)
+//app.use(haltOnTimedout)
 app.use(cookieParser())
-app.use(haltOnTimedout)
+//app.use(haltOnTimedout)
 
 // Add your routes here, etc.
 
 
 
 app.post('/save', function (req, res, next) {
- 
    req.setTimeout(0);
-    var url = 'https://dl.dropboxusercontent.com/u/5463008/to%20delete/2016-11-18%2017.56%20UI%20development%20discussion.mp4';
-  
-    download(url).then( function(result){
+    download().then( function(result){
       res.json({status:200});
 
     }).catch( function(err){
-      res.json({status:400});
+      console.log('err:%s', err);
+      res.json({status:err});
 
     });
  
 });
 
-function haltOnTimedout (req, res, next) {
-  if (!req.timedout) next()
-}
+// function haltOnTimedout (req, res, next) {
+//   if (!req.timedout) next()
+// }
 
 app.listen(3000)
